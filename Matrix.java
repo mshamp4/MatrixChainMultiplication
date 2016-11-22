@@ -1,164 +1,31 @@
 package multiplication;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.InputMismatchException;
-import java.util.Random;
-import java.util.Scanner;
-
 public class Matrix {
 
-	private int row;
+	public int matrixChainMultiplication(int matrix[], int start, int end) {
 
-	private int col;
+		if (start == end)
+			return 0;
 
-	private int matrix[][];
+		int min = Integer.MAX_VALUE;
 
-	public Matrix(int row, int col, int numRandoms) {
-		matrix = new int[row][col];
-		setRow(row);
-		setCol(col);
-		autoGenerateMatrix(numRandoms);
-	}
+		for (int i = start; i < end; i++) {
+			int count = matrixChainMultiplication(matrix, start, i) + 
+						matrixChainMultiplication(matrix, i + 1, end) + 
+						matrix[start - 1] * matrix[i] * matrix[end];
 
-	public Matrix(int row, int col) {
-		matrix = new int[row][col];
-		setRow(row);
-		setCol(col);
-	}
-
-	public Matrix() {
-		matrix = null;
-		setRow(0);
-		setCol(0);
-	}
-	
-	public void loadDimensions(String filename) {
-		
-//		Scanner fileReader = null; 
-		
-		
-		
-		
-	}
-
-	public void loadMatrixFile(String filename) {
-
-		Scanner fileReader = null;
-
-		try {
-			fileReader = new Scanner(new File(filename));
-			boolean firstLine = true;
-
-			while (fileReader.hasNextLine()) {
-				String input = fileReader.nextLine();
-				input = input.replaceAll("\\s+", "");
-				if (firstLine) {
-					setCol(input.length());
-					firstLine = false;
-				}
-				if (getCol() != input.length())
-					throw new InvalidColumns();
-				setRow(getRow() + 1);
+			if (count < min) {
+				min = count;
+				System.out.println(i);
+				System.out.println(start);
+				System.out.println(end);
 			}
-
-			int tempMatrix[][] = new int[row][col];
-			setMatrix(tempMatrix);
-
-			fileReader = new Scanner(new File(filename));
-
-			int r = 0;
-			int c = 0;
-			while (fileReader.hasNextLine()) {
-				if (c < col) {
-					matrix[r][c] = fileReader.nextInt();
-					c++;
-				} else {
-					c = 0;
-					r++;
-					fileReader.nextLine();
-				}
-			}
-
-		} catch (FileNotFoundException e) {
-			System.out.println("Error 404: File not found!");
-			System.exit(0);
-		} catch (InputMismatchException e) {
-			System.out.println("Error: make sure the file only contains only integers!");
-			System.exit(0);
-		} catch (InvalidColumns e) {
-			System.out.println("Error: invalid matrix dimensions!");
-			System.exit(0);
-		} finally {
-			fileReader.close();
 		}
-	}
 
-	public int getRow() {
-		return row;
-	}
-
-	private void setRow(int row) {
-		this.row = row;
-	}
-
-	public int getCol() {
-		return col;
-	}
-
-	private void setCol(int col) {
-		this.col = col;
-	}
-
-	public int[][] getMatrix() {
-		return matrix;
-	}
-
-	public void setMatrix(int[][] matrix) {
-		this.matrix = matrix;
+		return min;
 	}
 
 	public boolean multiplyCheck(int row, int col) {
 		return (row == col);
 	}
-
-	public void autoGenerateMatrix(int n) {
-
-		try {
-			if (n <= 0)
-				throw new IllegalArgumentException();
-		} catch (IllegalArgumentException e) {
-			System.out.println("Error: random numbers need to positive!");
-			System.exit(0);
-		}
-
-		Random random = new Random();
-		int i;
-
-		for (int r = 0; r < row; r++) {
-			for (int c = 0; c < col; c++) {
-				i = random.nextInt(n);
-				matrix[r][c] = i;
-			}
-
-		}
-	}
-
-	@Override
-	public String toString() { // call printArray
-		String temp = "";
-		for (int r = 0; r < row; r++) {
-			if (r != 0)
-				temp += "\n";
-			for (int c = 0; c < col; c++) {
-				temp += matrix[r][c] + " ";
-			}
-		}
-		return temp;
-	}
-
-//	@Override
-//	public String toString() {
-//		return "";
-//	}
 }
