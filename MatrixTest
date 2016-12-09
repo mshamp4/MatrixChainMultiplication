@@ -1,3 +1,5 @@
+package multiplication;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,11 +22,12 @@ public class MatrixTest {
 				arr[count++] = Integer.parseInt(input);
 				input = bufReader.readLine();
 			}
-			
+
 			MatrixChainMultiplication order = new MatrixChainMultiplication(arr);
 			int min = order.matrixOrder(arr, arr.length);
 			System.out.print("Minimum number of multiplications is: " + min + ". ");
-			System.out.println(order.printOptimalParen(order.getSplitParen(), 1, arr.length-1));
+			String result = order.printOptimalParen(order.getSplitParen(), 1, arr.length - 1);
+			System.out.println(order.addMultiplication(result));
 			System.out.println("Matrix Chain Table:" + order.printMatrixTable());
 
 		} catch (IOException e) {
