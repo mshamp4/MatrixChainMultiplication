@@ -1,35 +1,48 @@
+package multiplication;
 
 public class MatrixChainMultiplication {
-	
+
 	private int[] matrix;
-	
-	private int[] matrix2;
+
+	private int[] matrixOrder;
 
 	private int[][] mTable;
 
 	private int[][] splitParen;
 
+	private String result;
+
 	public MatrixChainMultiplication(int[] arr) {
 		setMatrix(arr);
-		setMatrix2(arr);
+		setmatrixOrder(arr);
+		matrixOrder(arr, arr.length);
+		setResult(printOptimalParen(getSplitParen(), 1, arr.length - 1));
 	}
-	
-	public void setMatrix2(int[] arr) {
-		matrix2 = new int[arr.length+1];
+
+	public void setmatrixOrder(int[] arr) {
+		matrixOrder = new int[arr.length + 1];
 		for (int i = 1; i <= arr.length; i++)
-			matrix2[i] = arr[i-1];
-		
-		for (int i = 0; i < matrix2.length; i++) {
-            for (int j = i+1; j < matrix2.length; j++) {
-                if ((matrix2[i] > matrix2[j]) && (i != j) ) {
-                    int temp = matrix2[j];
-                    matrix2[j] = matrix2[i];
-                    matrix2[i] = temp;
-                }
-            }
-        }
+			matrixOrder[i] = arr[i - 1];
+
+		for (int i = 0; i < matrixOrder.length; i++) {
+			for (int j = i + 1; j < matrixOrder.length; j++) {
+				if ((matrixOrder[i] > matrixOrder[j]) && (i != j)) {
+					int temp = matrixOrder[j];
+					matrixOrder[j] = matrixOrder[i];
+					matrixOrder[i] = temp;
+				}
+			}
+		}
 	}
-	
+
+	public String getResult() {
+		return result;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
 	public int[] getMatrix() {
 		return matrix;
 	}
@@ -51,8 +64,8 @@ public class MatrixChainMultiplication {
 			mTable[i][i] = 0;
 
 		for (int l = 2; l < end; l++) {
-			for (int i = 1; i < end - l+1; i++) {
-				int j = i + l-1;
+			for (int i = 1; i < end - l + 1; i++) {
+				int j = i + l - 1;
 				if (j == end)
 					continue;
 				mTable[i][j] = Integer.MAX_VALUE;
@@ -60,31 +73,62 @@ public class MatrixChainMultiplication {
 					int count = mTable[i][k] + mTable[k + 1][j] + matrix[i - 1] * matrix[k] * matrix[j];
 					if (count < mTable[i][j]) {
 						mTable[i][j] = count; // saves minimum operation
-						splitParen[i][j] = k; // saves k position where the parenthesis was inserted
+						splitParen[i][j] = k; // saves k position where the
+											  // parenthesis was inserted
 					}
 				}
 			}
 		}
-		return mTable[1][end - 1]; // returns the lowest value in the mTable 
+		return mTable[1][end - 1]; // returns the lowest value in the mTable
 	}
+
+	public String addMultiplication(String str) {
+
+		// TO-DO this only works with matrices that are 9 or less. It compares a single character and matrices with 
+	    // higher dimensions won't work.
 		
+		for (int i = 0; i < matrixOrder.length; i++) {
+			if (matrixOrder[i] >= 10) {
+				System.out.print("This does not work with matrices over dimenions of 9");
+				System.exit(0);
+			}
+		}
+		
+		int count = 1;
+
+		for (int i = 0; i < str.length(); i++) {
+			if (str.substring(i, i + 1).equals("" + matrixOrder[count]) && Character.isDigit(str.charAt(i + 1))) {
+				str = str.substring(0, i + 1) + "*" + str.substring(i + 1);
+				count = count + 2;
+			} else if (str.substring(i, i + 1).equals("" + matrixOrder[count]) && str.charAt(i - 1) == ')') {
+				str = str.substring(0, i) + "*" + str.substring(i);
+				count++;
+			} else if (str.substring(i, i + 1).equals("" + matrixOrder[count]) && str.charAt(i + 1) == '(') {
+				str = str.substring(0, i + 1) + "*" + str.substring(i + 1);
+				count++;
+			}
+		}
+		return str;
+	}
+
 	public String printOptimalParen(int[][] split, int i, int j) {
+
 		if (i == j)
-			return matrix2[i] + "*"; // prints the matrix at index i
+			return matrixOrder[i] + ""; // prints the matrix at index i
 		else {
 			int k = split[i][j];
 			return "(" + printOptimalParen(split, i, k) + printOptimalParen(split, k + 1, j) + ")";
 		}
 	}
-	
+
 	public String printMatrixTable() {
 		String table = "";
 		for (int r = 1; r < mTable.length; r++) {
 			table += "\n";
 			for (int c = 1; c < mTable[r].length; c++) {
-				if (c == mTable[r].length-1)
+				if (c == mTable[r].length - 1)
 					table += mTable[r][c];
-				else 
+				else
 					table += mTable[r][c] + ", ";
 			}
 		}
